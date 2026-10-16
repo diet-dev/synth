@@ -1,5 +1,6 @@
 import { highpass, lowpass } from "./filters.ts";
 import { rng } from "./rng.ts";
+import { renderClassic } from "./classic.ts";
 import type { Env, Preset, Voice, Wave } from "./types.ts";
 import { SAMPLE_RATE } from "./wav.ts";
 
@@ -88,7 +89,7 @@ export function render(preset: Preset, seed: number, rate: number = SAMPLE_RATE)
   const rand = rng(seed);
   const sum = new Float32Array(n);
   for (const v of preset.voices) {
-    const s = renderVoice(v, n, rate, rand);
+    const s = "kind" in v ? renderClassic(v, n, rate, rand) : renderVoice(v, n, rate, rand);
     for (let i = 0; i < n; i++) sum[i] += s[i];
   }
   if (preset.lp) for (let p = 0; p < (preset.lpPasses ?? 1); p++) lowpass(sum, preset.lp, rate);
@@ -107,7 +108,7 @@ export function renderVariants(preset: Preset, seeds: number[], rate: number = S
   const all = seeds.map((seed) => render(preset, seed, rate));
   let max = 0;
   for (const s of all) for (let i = 0; i < s.length; i++) max = Math.max(max, Math.abs(s[i]));
-  const k = max > 0 ? (preset.peak ?? 0.6) / max : 1;
+  const k = preset.peak !== undefined && max > 0 ? preset.peak / max : 1;
   for (const s of all) for (let i = 0; i < s.length; i++) s[i] *= k;
   return all;
 }
