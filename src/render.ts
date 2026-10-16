@@ -31,19 +31,51 @@ function envAt(env: Env | undefined, t: number, total: number): number {
   return env.exp ? Math.exp(-5 * k) : 1 - k;
 }
 
-function renderVoice(v: Voice, n: number, rate: number, rand: () => number): Float32Array {
+function renderPulses(v: Voice, n: number, rate: number, rand: () => number): Float32Array {
+  const p = v.pulses!;
   const out = new Float32Array(n);
-  const total = (n * 1000) / rate;
-  const from = v.hz ?? 440;
-  const to = v.toHz ?? from;
-  const gain = v.gain ?? 1;
+  const hz = v.hz ?? 440;
   const duty = v.duty ?? 0.5;
-  let phase = 0;
+  const tau = (p.decay * rate) / 1000;
+  const len = Math.round(((p.len ?? 6 * p.decay) * rate) / 1000);
+  // Тон внутри толчка — с фазы 0 от его начала, как удар поршня
+  for (let t = 0; t < n; t += (rate / p.rate) * (1 + (p.jitter ?? 0) * (2 * rand() - 1))) {
+    const at = Math.round(t);
+    const amp = 1 + (p.ampJitter ?? 0) * (2 * rand() - 1);
+    for (let i = 0; i < len && at + i < n; i++) {
+      let x = osc(v.wave, (hz * i) / rate, duty, rand);
+      if (v.noise) x += v.noise * (2 * rand() - 1);
+      out[at + i] += amp * Math.exp(-i / tau) * x;
+    }
+  }
+  return out;
+}
+
+function renderVoice(v: Voice, n: number, rate: number, rand: () => number): Float32Array {
+  const total = (n * 1000) / rate;
+  const gain = v.gain ?? 1;
+  let out: Float32Array;
+  if (v.pulses) {
+    out = renderPulses(v, n, rate, rand);
+  } else {
+    out = new Float32Array(n);
+    const from = v.hz ?? 440;
+    const to = v.toHz ?? from;
+    const duty = v.duty ?? 0.5;
+    let phase = 0;
+    for (let i = 0; i < n; i++) {
+      let x = osc(v.wave, phase, duty, rand);
+      if (v.noise) x += v.noise * (2 * rand() - 1);
+      out[i] = x;
+      let hz = from + ((to - from) * i) / n;
+      if (v.fm) hz *= 1 + v.fm.depth * Math.sin((2 * Math.PI * v.fm.hz * i) / rate);
+      phase += hz / rate;
+    }
+  }
   for (let i = 0; i < n; i++) {
-    let x = osc(v.wave, phase, duty, rand);
-    if (v.noise) x += v.noise * (2 * rand() - 1);
-    out[i] = gain * x * envAt(v.env, (i * 1000) / rate, total);
-    phase += (from + ((to - from) * i) / n) / rate;
+    let k = gain * envAt(v.env, (i * 1000) / rate, total);
+    if (v.am) k *= 1 - v.am.depth + v.am.depth * Math.sin((2 * Math.PI * v.am.hz * i) / rate);
+    out[i] *= k;
   }
   if (v.lp) lowpass(out, v.lp, rate);
   if (v.hp) highpass(out, v.hp, rate);
