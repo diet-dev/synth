@@ -1,0 +1,39 @@
+{
+  "name": "@dietdev/synth",
+  "version": "0.1.0",
+  "description": "Синтез звуковых эффектов для игр по компактным пресетам: слои, толчки с разбросом, LFO, фильтры; рендер в WAV data URL",
+  "keywords": [
+    "audio",
+    "sfx",
+    "synth",
+    "sound",
+    "game",
+    "typescript"
+  ],
+  "author": "dietdev <dietdev.tech@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "node --disable-warning=ExperimentalWarning --test \"test/*.test.ts\"",
+    "prepare": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.3"
+  }
+}
