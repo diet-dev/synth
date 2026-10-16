@@ -50,4 +50,13 @@ describe("pulses", () => {
     const mean = r.reduce((a, b) => a + b, 0) / r.length;
     assert.ok(Math.abs(mean - 0.152) <= 0.152 * 0.15, String(mean));
   });
+
+  for (const rate of [0, -5]) {
+    it(`rate ${rate} не вешает рендер — тишина`, () => {
+      const s = render({ ms: 100, voices: [{ wave: "square", duty: 1, hz: 1, pulses: { rate, decay: 5 } }] }, 1);
+      assert.equal(s.length, 4410);
+      assert.ok(s.every((v) => v === 0));
+    });
+  }
+
 });

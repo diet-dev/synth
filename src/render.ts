@@ -35,12 +35,15 @@ function envAt(env: Env | undefined, t: number, total: number): number {
 function renderPulses(v: Voice, n: number, rate: number, rand: () => number): Float32Array {
   const p = v.pulses!;
   const out = new Float32Array(n);
+  // Неположительная частота толчков — тишина, а не вечный цикл
+  if (!(p.rate > 0)) return out;
   const hz = v.hz ?? 440;
   const duty = v.duty ?? 0.5;
   const tau = (p.decay * rate) / 1000;
   const len = Math.round(((p.len ?? 6 * p.decay) * rate) / 1000);
   // Тон внутри толчка — с фазы 0 от его начала, как удар поршня
-  for (let t = 0; t < n; t += (rate / p.rate) * (1 + (p.jitter ?? 0) * (2 * rand() - 1))) {
+  // Шаг не меньше сэмпла: при jitter ≥ 1 толчки иначе шли бы назад
+  for (let t = 0; t < n; t += Math.max(1, (rate / p.rate) * (1 + (p.jitter ?? 0) * (2 * rand() - 1)))) {
     const at = Math.round(t);
     const amp = 1 + (p.ampJitter ?? 0) * (2 * rand() - 1);
     for (let i = 0; i < len && at + i < n; i++) {
