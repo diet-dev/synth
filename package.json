@@ -12,6 +12,14 @@
   ],
   "author": "Diet Dev <dietdev.tech@gmail.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diet-dev/synth.git"
+  },
+  "homepage": "https://github.com/diet-dev/synth#readme",
+  "bugs": {
+    "url": "https://github.com/diet-dev/synth/issues"
+  },
   "type": "module",
   "exports": {
     ".": {
