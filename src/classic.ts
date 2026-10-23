@@ -90,8 +90,9 @@ function runClassic(v: Classic, n: number, rate: number, rand: () => number): { 
       F = stage === 1 ? hold : dec;
     }
     if (stage === 0) w = ev / att;
-    else if (stage === 1) w = 1 + 2 * (1 - ev / hold) * punch;
-    else if (stage === 2) w = 1 - ev / dec;
+    // Нулевая стадия проходится за сэмпл — без деления 0/0
+    else if (stage === 1) w = hold ? 1 + 2 * (1 - ev / hold) * punch : 1;
+    else if (stage === 2) w = dec ? 1 - ev / dec : 0;
     else {
       w = 0;
       stop = true;
@@ -100,7 +101,7 @@ function runClassic(v: Classic, n: number, rate: number, rand: () => number): { 
       D += dD;
       s = D | 0;
       if (s < 0) s = -s;
-      else if (s > 1023) s = 1023;
+      if (s > 1023) s = 1023;
     }
     if (filtered && Q) r = Math.min(0.1, Math.max(1e-5, r * Q));
 
