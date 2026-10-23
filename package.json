@@ -45,10 +45,14 @@
     "typecheck": "tsc --noEmit",
     "test": "node --disable-warning=ExperimentalWarning --test \"test/*.test.ts\"",
     "prepare": "npm run build",
-    "prepublishOnly": "npm run typecheck && npm test"
+    "prepublishOnly": "npm run typecheck && npm test",
+    "dev": "vite",
+    "build:demo": "vite build",
+    "preview": "vite preview"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite": "^8.3.5"
   }
 }
