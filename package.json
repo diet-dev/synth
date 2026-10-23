@@ -10,7 +10,7 @@
     "game",
     "typescript"
   ],
-  "author": "dietdev <dietdev.tech@gmail.com>",
+  "author": "Diet Dev <dietdev.tech@gmail.com>",
   "license": "MIT",
   "type": "module",
   "exports": {
