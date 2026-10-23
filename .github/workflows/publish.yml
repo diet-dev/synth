@@ -1,0 +1,29 @@
+name: Publish
+
+# Публикация по тегу v<версия> через Trusted Publishing: без токена, с provenance.
+# Один раз: npmjs.com → пакет → Settings → Trusted Publisher → GitHub Actions,
+# репозиторий diet-dev/synth, workflow publish.yml.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      # Trusted Publishing требует npm ≥ 11.5.1
+      - run: npm install -g npm@latest
+      - name: Тег совпадает с версией в package.json
+        run: test "${GITHUB_REF_NAME}" = "v$(node -p 'require("./package.json").version')"
+      - run: npm ci
+      # prepublishOnly — typecheck и тесты, prepare — сборка
+      - run: npm publish
