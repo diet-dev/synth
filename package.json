@@ -20,7 +20,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "NOTICE.md"
   ],
   "sideEffects": false,
   "engines": {
