@@ -11,7 +11,7 @@ type Variant = { tick: number; count: number; pool: HTMLAudioElement[] };
 
 /** Пул Audio на ключ: по варианту-URL на звук, count экземпляров на вариант. */
 export class SfxPlayer {
-  public sounds: { [key: string]: Variant[] } = {};
+  private sounds: { [key: string]: Variant[] } = {};
 
   private options: SfxOptions;
   private queue: [string, number, string[]][] = [];
