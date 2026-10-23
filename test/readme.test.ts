@@ -1,25 +1,12 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 import * as synth from "../src/index.ts";
+import { readmeRecipes } from "./reference/recipes.ts";
 
 // Рецепты README исполняются как есть: пресет в README, сломавшийся от правки
 // пакета, должен ронять тест, а не вводить читателя в заблуждение
-const readme = readFileSync(fileURLToPath(new URL("../README.md", import.meta.url)), "utf8");
-const section = readme.slice(readme.indexOf("## Рецепты"), readme.indexOf("## Зацикленный"));
-const blocks = [...section.matchAll(/```ts\n([\s\S]*?)```/g)].map((m) => m[1]);
-
-function presetsOf(code: string): Record<string, synth.Preset> {
-  // Строка с рендером в рецепте мотора — пример использования, не пресет
-  const js = code.replace(/^const urls[\s\S]*$/m, "").replace(/: Preset/g, "").replace(/^const (\w+) =/gm, "out.$1 =");
-  const out: Record<string, synth.Preset> = {};
-  new Function("out", js)(out);
-  return out;
-}
-
 describe("README: рецепты", () => {
-  const all = Object.assign({}, ...blocks.map(presetsOf)) as Record<string, synth.Preset>;
+  const all = readmeRecipes();
 
   it("в разделе есть рецепты", () => {
     assert.deepEqual(Object.keys(all).sort(), ["BOOM", "CLICK", "COIN", "ENGINE", "LASER", "SHOT"]);
