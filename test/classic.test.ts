@@ -33,3 +33,24 @@ describe("classic: отпечатки звуков", () => {
     assert.notDeepEqual(render(p, 1), render(p, 2));
   });
 });
+
+describe("classic: крайние значения", () => {
+  const finite = (v: object): void => {
+    const s = render({ ms: 300, voices: [{ kind: "classic", wave: "square", hz: 440, env: { a: 0, h: 100, d: 100 }, ...v }] }, 1);
+    for (const x of s) assert.ok(Number.isFinite(x), JSON.stringify(v));
+  };
+
+  it("фазер с большой отрицательной задержкой — модуль, затем предел 1023, как в jsfxr", () => {
+    finite({ phaser: { ms: -10 } });
+    // −10 мс и +10 мс — одна и та же задержка
+    const a = render({ ms: 100, voices: [{ kind: "classic", wave: "saw", hz: 440, env: { a: 0, h: 50, d: 50 }, phaser: { ms: -10 } }] }, 1);
+    const b = render({ ms: 100, voices: [{ kind: "classic", wave: "saw", hz: 440, env: { a: 0, h: 50, d: 50 }, phaser: { ms: 10 } }] }, 1);
+    assert.deepEqual(a, b);
+  });
+
+  it("нулевое удержание или спад огибающей", () => {
+    finite({ env: { a: 0, h: 0, d: 100 } });
+    finite({ env: { a: 0, h: 100, d: 0 } });
+    finite({ env: { a: 0, h: 0, d: 0 } });
+  });
+});
