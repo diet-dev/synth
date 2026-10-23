@@ -3,10 +3,68 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@dietdev/synth — генератор звуков</title>
+    <title>synth — генератор звуков</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%236d5efc'/><path d='M4 16h4l3-8 4 16 4-12 3 8 2-4h4' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/></svg>" />
+    <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <div id="app"></div>
+    <header class="top">
+      <div class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <span class="name">@dietdev/synth</span>
+        <span class="tagline">генератор звуков для игр</span>
+      </div>
+      <nav class="links">
+        <a href="https://github.com/diet-dev/synth#readme" target="_blank" rel="noopener">Документация</a>
+        <a href="https://www.npmjs.com/package/@dietdev/synth" target="_blank" rel="noopener">npm</a>
+      </nav>
+    </header>
+
+    <main class="app">
+      <aside class="side">
+        <div id="categories"></div>
+        <button id="mutate" class="btn wide accent-soft" title="Чуть-чуть сдвинуть все числа текущего звука">🎲 Мутировать</button>
+        <h2 class="side-title">Примеры</h2>
+        <ul id="examples" class="examples"></ul>
+      </aside>
+
+      <section class="center">
+        <div class="stage">
+          <div class="stage-head">
+            <div>
+              <div id="sound-name" class="sound-name"></div>
+              <div id="sound-meta" class="sound-meta"></div>
+            </div>
+          </div>
+          <canvas id="wave" class="wave"></canvas>
+          <div class="transport">
+            <button id="play" class="btn primary" title="Пробел">▶ Играть <kbd>пробел</kbd></button>
+            <button id="variant" class="btn" title="Другой сид — другой рисунок шума и разброса">🔀 Другой вариант</button>
+            <span id="seed" class="seed"></span>
+            <span class="spacer"></span>
+            <button id="loop" class="btn" title="Перезапускать клип по кругу, как в игре">🔁 Цикл</button>
+            <label class="period" title="Период перезапуска в игре">
+              период
+              <input id="period" type="range" min="50" max="1000" step="1" />
+              <output id="period-out"></output>
+            </label>
+          </div>
+        </div>
+        <div id="editor" class="editor"></div>
+      </section>
+
+      <aside class="code">
+        <div class="code-head">
+          <h2>Пресет</h2>
+          <div class="code-actions">
+            <button id="copy" class="btn primary">📋 Копировать</button>
+            <button id="wav" class="btn">⬇ WAV</button>
+          </div>
+        </div>
+        <pre id="code" class="code-body"></pre>
+        <p class="hint">Вставьте в игру и рендерьте: <code>toWav(renderVariants(PRESET, [1])[0])</code></p>
+      </aside>
+    </main>
     <script type="module" src="./main.ts"></script>
   </body>
 </html>

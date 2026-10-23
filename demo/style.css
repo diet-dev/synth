@@ -1,0 +1,459 @@
+:root {
+  --bg: #f4f4f7;
+  --panel: #ffffff;
+  --panel-2: #f8f8fb;
+  --line: #e3e3ea;
+  --text: #1d1d24;
+  --muted: #6b6b7a;
+  --accent: #6d5efc;
+  --accent-text: #ffffff;
+  --accent-soft: #ecebff;
+  --accent-soft-text: #4b3fd6;
+  --wave: #6d5efc;
+  --wave-bg: #fbfbfe;
+  --wave-axis: #d9d9e6;
+  --code-bg: #1b1b24;
+  --code-text: #e6e6f0;
+  --code-key: #9fb4ff;
+  --code-num: #ffcf87;
+  --code-str: #9de5b3;
+  --code-com: #7c7c92;
+  --shadow: 0 1px 2px rgb(20 20 40 / 0.06), 0 4px 16px rgb(20 20 40 / 0.04);
+  --radius: 12px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111116;
+    --panel: #1a1a21;
+    --panel-2: #20202a;
+    --line: #2c2c38;
+    --text: #e8e8f0;
+    --muted: #9696a8;
+    --accent: #8578ff;
+    --accent-soft: #2a2747;
+    --accent-soft-text: #c3bcff;
+    --wave: #9c92ff;
+    --wave-bg: #15151b;
+    --wave-axis: #2c2c38;
+    --code-bg: #0d0d12;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+    color-scheme: dark;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  min-width: 1200px;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+kbd {
+  font: 11px ui-monospace, monospace;
+  padding: 1px 5px;
+  margin-left: 6px;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 0.2);
+}
+
+/* ── Шапка */
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.logo {
+  align-self: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--accent);
+  mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7'/></svg>");
+}
+.name {
+  font-weight: 650;
+  font-size: 16px;
+}
+.tagline {
+  color: var(--muted);
+}
+.links {
+  display: flex;
+  gap: 18px;
+}
+.links a {
+  color: var(--muted);
+  text-decoration: none;
+}
+.links a:hover {
+  color: var(--accent);
+}
+
+/* ── Три колонки */
+.app {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr) 400px;
+  gap: 20px;
+  padding: 20px 24px;
+  align-items: start;
+}
+
+.side,
+.code {
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+}
+
+/* ── Кнопки */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s, border-color 0.12s, transform 0.06s;
+}
+.btn:hover {
+  border-color: var(--accent);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+.btn.on,
+.btn.accent-soft {
+  background: var(--accent-soft);
+  border-color: transparent;
+  color: var(--accent-soft-text);
+}
+.btn.on {
+  border-color: var(--accent);
+}
+.btn.wide {
+  width: 100%;
+  margin: 14px 0 4px;
+  padding: 9px;
+  font-weight: 600;
+}
+.btn.small {
+  padding: 4px 9px;
+  font-size: 13px;
+}
+
+/* ── Левая колонка */
+.side-title,
+.group-title {
+  margin: 18px 0 8px;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.group-title:first-child {
+  margin-top: 0;
+}
+.cats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.cat {
+  justify-content: flex-start;
+  padding: 8px 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cat .icon {
+  width: 20px;
+  text-align: center;
+}
+.cat.active {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.examples {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+.examples button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.examples button:hover {
+  background: var(--panel);
+}
+.examples button.active {
+  background: var(--accent-soft);
+  color: var(--accent-soft-text);
+}
+.examples .tri {
+  color: var(--accent);
+  font-size: 11px;
+}
+.examples .tag {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* ── Центр: сцена */
+.stage,
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.stage {
+  padding: 16px;
+}
+.sound-name {
+  font: 600 18px ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.sound-meta {
+  color: var(--muted);
+  margin-top: 2px;
+}
+.wave {
+  display: block;
+  width: 100%;
+  height: 150px;
+  margin: 12px 0;
+  border-radius: 8px;
+  background: var(--wave-bg);
+  cursor: pointer;
+}
+.transport {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.spacer {
+  flex: 1;
+}
+.seed {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.period {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+.period output {
+  min-width: 56px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+/* ── Редактор */
+.editor {
+  margin-top: 20px;
+  display: grid;
+  gap: 16px;
+}
+.voices-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.tab {
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  cursor: pointer;
+}
+.tab.active {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--panel);
+}
+.tab small {
+  opacity: 0.65;
+  margin-left: 4px;
+}
+.blocks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.block {
+  padding: 12px 14px;
+}
+.block.off {
+  background: var(--panel-2);
+  box-shadow: none;
+}
+.block-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.block.off .block-head {
+  margin-bottom: 0;
+  color: var(--muted);
+}
+.block.off .rows {
+  display: none;
+}
+.rows {
+  display: grid;
+  gap: 4px;
+}
+.row {
+  display: grid;
+  grid-template-columns: 18px 116px minmax(0, 1fr) 112px;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+}
+.row .label {
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.row.disabled .label,
+.row.disabled .num {
+  opacity: 0.45;
+}
+.row input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+.row input[type="checkbox"],
+.block-head input[type="checkbox"] {
+  accent-color: var(--accent);
+  margin: 0;
+}
+.num {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.num input {
+  width: 100%;
+  padding: 3px 5px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel-2);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.num .unit {
+  font-size: 11px;
+  color: var(--muted);
+  min-width: 34px;
+  white-space: nowrap;
+}
+.row.bool .label {
+  grid-column: 2 / 5;
+}
+.row select {
+  grid-column: 3 / 5;
+  padding: 4px 6px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel-2);
+}
+
+/* ── Правая колонка: код */
+.code-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.code-head h2 {
+  margin: 0;
+  font-size: 16px;
+}
+.code-actions {
+  display: flex;
+  gap: 6px;
+}
+.code-body {
+  margin: 0;
+  padding: 16px;
+  border-radius: var(--radius);
+  background: var(--code-bg);
+  color: var(--code-text);
+  font: 12.5px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.code-body .k {
+  color: var(--code-key);
+}
+.code-body .n {
+  color: var(--code-num);
+}
+.code-body .s {
+  color: var(--code-str);
+}
+.code-body .c {
+  color: var(--code-com);
+  font-style: italic;
+}
+.hint {
+  color: var(--muted);
+  font-size: 12px;
+}
+.hint code {
+  font-size: 11.5px;
+}

@@ -4,7 +4,8 @@ import { CLASSIC_SCHEMA, PRESET_SCHEMA, TONAL_SCHEMA, type Block } from "./schem
 import type { Sound } from "./types.ts";
 
 type Obj = Record<string, unknown>;
-const WIDTH = 80;
+// Ширина под правую колонку демки — код читается без прокрутки
+const WIDTH = 56;
 
 /** Порядок ключей — как в схеме: поля, затем блоки; kind и voices — на своих местах. */
 function order(o: Obj, schema: Block[], first: string[], last: string[]): string[] {

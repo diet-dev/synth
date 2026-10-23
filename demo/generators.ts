@@ -336,13 +336,13 @@ export const CATEGORIES: Category[] = [
   { id: "blip", label: "Блип", icon: "🔹", group: "game", loop: false, make: blip },
   { id: "motor", label: "Мотор", icon: "⚙️", group: "own", loop: true, make: motor },
   { id: "hum", label: "Гул", icon: "〰️", group: "own", loop: true, make: hum },
-  { id: "rattle", label: "Трещотка", icon: "🪇", group: "own", loop: true, make: rattle },
+  { id: "rattle", label: "Трещотка", icon: "🥁", group: "own", loop: true, make: rattle },
   { id: "click", label: "Клик", icon: "🖱️", group: "ui", loop: false, make: click },
   { id: "hover", label: "Наведение", icon: "👆", group: "ui", loop: false, make: hover },
   { id: "switch", label: "Переключение", icon: "🔀", group: "ui", loop: false, make: toggle },
   { id: "open", label: "Открыть", icon: "📂", group: "ui", loop: false, make: open },
   { id: "close", label: "Закрыть", icon: "✖️", group: "ui", loop: false, make: close },
-  { id: "confirm", label: "Подтверждение", icon: "✔️", group: "ui", loop: false, make: confirm },
+  { id: "confirm", label: "Подтвердить", icon: "✔️", group: "ui", loop: false, make: confirm },
   { id: "error", label: "Ошибка", icon: "⛔", group: "ui", loop: false, make: error },
 ];
 
