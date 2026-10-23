@@ -38,26 +38,37 @@ let active = initial ? "" : `ex:${EXAMPLES[0].id}`;
 let last: Float32Array | null = null;
 
 // ── Рендер и звук
+// Режим (цикл или разовый звук) меняется сразу по клику, а рендер приходит
+// позже: результат, заказанный в другом режиме, отбрасывается — его заменит
+// рендер, заказанный при смене режима.
+let loopWanted = false;
+
 async function update(play: boolean): Promise<void> {
-  const looping = player.looping;
-  const res = await renderer.request({ preset: state.sound.preset, seeds: looping ? LOOP_SEEDS : [state.seed] });
-  if (!res) return;
+  const loop = loopWanted;
+  let res: Float32Array[] | null;
+  try {
+    res = await renderer.request({ preset: state.sound.preset, seeds: loop ? LOOP_SEEDS : [state.seed] });
+  } catch (e) {
+    console.error("Рендер не удался", e);
+    return;
+  }
+  if (!res || loop !== loopWanted) return;
   last = res[0];
   drawWave($("wave"), last);
-  if (player.looping) player.setLoopVariants(res);
-  else if (play) player.playOnce(last);
+  if (!loop) {
+    if (play) player.playOnce(last);
+  } else if (player.looping) player.setLoopVariants(res);
+  else player.startLoop(res, state.period);
 }
 
-async function startLoop(): Promise<void> {
-  const res = await renderer.request({ preset: state.sound.preset, seeds: LOOP_SEEDS });
-  if (!res) return;
-  last = res[0];
-  drawWave($("wave"), last);
-  player.startLoop(res, state.period);
+function startLoop(): void {
+  loopWanted = true;
   syncTransport();
+  void update(false);
 }
 
 function stopLoop(): void {
+  loopWanted = false;
   player.stopLoop();
   syncTransport();
 }
@@ -84,7 +95,7 @@ function render(): void {
   const p = state.sound.preset;
   const voices = p.voices.length === 1 ? "1 голос" : p.voices.length < 5 ? `${p.voices.length} голоса` : `${p.voices.length} голосов`;
   $("sound-meta").textContent = `${Math.round(p.ms)} мс · ${voices}${state.sound.loop ? " · для цикла" : ""}`;
-  $("seed").textContent = player.looping ? "варианты 1–3" : `вариант ${state.seed}`;
+  $("seed").textContent = loopWanted ? "варианты 1–3" : `вариант ${state.seed}`;
   document.querySelectorAll<HTMLElement>("[data-key]").forEach((b) => b.classList.toggle("active", b.dataset.key === active));
 }
 
@@ -94,8 +105,8 @@ function save(): void {
 
 function syncTransport(): void {
   const loop = $("loop");
-  loop.classList.toggle("on", player.looping);
-  loop.textContent = player.looping ? "■ Стоп" : "🔁 Цикл";
+  loop.classList.toggle("on", loopWanted);
+  loop.textContent = loopWanted ? "■ Стоп" : "🔁 Цикл";
   ($("period") as HTMLInputElement).value = String(state.period);
   $("period-out").textContent = `${state.period} мс`;
   render();
@@ -109,7 +120,7 @@ function load(sound: Sound, g: Group, key: string): void {
   editor.refresh();
   render();
   save();
-  if (sound.loop) void startLoop();
+  if (sound.loop) startLoop();
   else {
     stopLoop();
     void update(true);
@@ -171,19 +182,19 @@ $("mutate").onclick = () => {
 
 // ── Центр
 function play(): void {
-  if (player.looping) stopLoop();
+  if (loopWanted) stopLoop();
   void update(true);
 }
 $("play").onclick = play;
 $("wave").onclick = play;
 $("variant").onclick = () => {
-  if (player.looping) return;
+  if (loopWanted) return;
   state.seed += 1;
   render();
   save();
   void update(true);
 };
-$("loop").onclick = () => (player.looping ? stopLoop() : void startLoop());
+$("loop").onclick = () => (loopWanted ? stopLoop() : startLoop());
 const period = $("period") as HTMLInputElement;
 period.oninput = () => {
   state.period = Number(period.value);
@@ -202,9 +213,13 @@ document.addEventListener("keydown", (e) => {
 
 // ── Правая колонка
 $("copy").onclick = async () => {
-  await navigator.clipboard.writeText(presetCode(state.sound, state.period));
   const b = $("copy");
-  b.textContent = "✓ Скопировано";
+  try {
+    await navigator.clipboard.writeText(presetCode(state.sound, state.period));
+    b.textContent = "✓ Скопировано";
+  } catch {
+    b.textContent = "Нет доступа к буферу";
+  }
   setTimeout(() => (b.textContent = "📋 Копировать"), 1500);
 };
 $("wav").onclick = () => {
