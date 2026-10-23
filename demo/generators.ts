@@ -38,9 +38,9 @@ const sfxDuty = (d: number): number => 0.5 - d * 0.5;
 const sfxDutySlide = (r: number): number => -r * 0.00005 * R;
 const sfxHp = (f: number): number => (f * f * 0.1 * SUB) / (2 * Math.PI);
 const sfxLp = (f: number): number => (f ** 3 * 0.1 * SUB) / (2 * Math.PI);
-const sfxVib = (strength: number, speed: number): { hz: number; depth: number } => ({
+export const sfxVib = (strength: number, speed: number): { hz: number; depth: number } => ({
   hz: (speed * speed * 0.01 * R) / (2 * Math.PI),
-  depth: strength * strength * 0.5,
+  depth: strength * 0.5,
 });
 const sfxPhaser = (offset: number, ramp: number): { ms: number; slide: number } => ({
   ms: (Math.sign(offset) * offset * offset * 1020 * 1000) / SUB,
@@ -95,7 +95,7 @@ function fromSfx(s: Sfx, peak: number): Preset {
     v.minHz = round(sfxHz(s.limit), 1);
     v.stopAtMin = true;
   }
-  if (s.vibStrength) v.vib = { hz: round(sfxVib(s.vibStrength, s.vibSpeed).hz), depth: round(sfxVib(s.vibStrength, s.vibSpeed).depth, 3) };
+  if (s.vibStrength && sfxVib(s.vibStrength, s.vibSpeed).hz >= 0.1) v.vib = { hz: round(sfxVib(s.vibStrength, s.vibSpeed).hz), depth: round(sfxVib(s.vibStrength, s.vibSpeed).depth, 3) };
   if (s.arpMod) {
     const j = sfxJump(s.arpSpeed, s.arpMod);
     v.jump = { ms: round(j.ms), ratio: round(j.ratio, 3) };
@@ -106,7 +106,8 @@ function fromSfx(s: Sfx, peak: number): Preset {
     if (s.dutyRamp) v.dutySlide = round(sfxDutySlide(s.dutyRamp), 3);
   }
   if (s.lpf < 1) v.lp = { hz: round(sfxLp(s.lpf), 1), ...(s.lpfRamp ? { slide: round(s.lpfRamp * 10, 3) } : {}), ...(s.lpfRes ? { res: round(s.lpfRes) } : {}) };
-  if (s.hpf > 0) v.hp = { hz: round(sfxHp(s.hpf), 1), ...(s.hpfRamp ? { slide: round(s.hpfRamp * 10, 3) } : {}) };
+  // Срез ниже 0,1 Гц не слышен — такой ФВЧ не добавляем
+  if (sfxHp(s.hpf) >= 0.1) v.hp = { hz: round(sfxHp(s.hpf), 1), ...(s.hpfRamp ? { slide: round(s.hpfRamp * 10, 3) } : {}) };
   if (s.phaOffset) v.phaser = { ms: round(sfxPhaser(s.phaOffset, s.phaRamp).ms, 3), slide: round(sfxPhaser(s.phaOffset, s.phaRamp).slide, 3) };
   const ms = Math.min(LIMITS.game.maxMs, Math.ceil(v.env.a + v.env.h + v.env.d) + 10);
   return { ms, peak, voices: [v] };

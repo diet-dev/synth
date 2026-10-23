@@ -74,7 +74,7 @@ export class Player {
 
   private pump(): void {
     const ctx = this.ctx!;
-    for (const { at, variant } of this.scheduler.plan(ctx.currentTime + LOOKAHEAD)) {
+    for (const { at, variant } of this.scheduler.plan(ctx.currentTime + LOOKAHEAD, ctx.currentTime - 0.03)) {
       const src = ctx.createBufferSource();
       src.buffer = this.buffers[variant];
       src.connect(this.loopOut!);

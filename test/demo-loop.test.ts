@@ -50,3 +50,21 @@ describe("LoopScheduler", () => {
     for (const x of after) assert.equal(x.variant, 0);
   });
 });
+
+describe("LoopScheduler: защита", () => {
+  it("неположительный период — без перезапусков и без зависания", () => {
+    const l = new LoopScheduler(rng(1));
+    l.setPeriod(0);
+    l.setLengths([0.2]);
+    l.start(0);
+    assert.deepEqual(l.plan(1), []);
+  });
+
+  it("пропущенные перезапуски (вкладка спала) не играют пачкой", () => {
+    const l = make();
+    l.plan(0.1);
+    const late = l.plan(5, 4.9);
+    assert.ok(late.every((s) => s.at >= 4.9 - 1e-9), JSON.stringify(late));
+    assert.ok(late.length <= 1);
+  });
+});

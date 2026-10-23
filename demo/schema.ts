@@ -112,9 +112,9 @@ export const CLASSIC_SCHEMA: Block[] = [
     fields: [
       { kind: "select", key: "wave", label: "Волна", options: ["square", "saw", "sine", "noise"], def: "square" },
       num("hz", "Частота", 20, 12000, 1, 440, { ...HZ, required: true }),
-      num("slide", "Сдвиг тона", -60, 60, 0.01, 0, { unit: "окт/с" }),
+      num("slide", "Сдвиг тона", -240, 240, 0.01, 0, { unit: "окт/с" }),
       num("accel", "Ускорение", -60, 60, 0.01, 0, { unit: "окт/с²" }),
-      num("minHz", "Нижний предел", 10, 2000, 1, 50, { ...HZ, optional: true }),
+      num("minHz", "Нижний предел", 1, 8000, 0.1, 50, { ...HZ, optional: true }),
       { kind: "bool", key: "stopAtMin", label: "Обрыв на пределе", def: false },
       num("repeat", "Повтор", 10, 2000, 1, 200, { ...MS, optional: true }),
       num("duty", "Скважность", 0, 0.5, 0.01, 0.5),
@@ -137,7 +137,7 @@ export const CLASSIC_SCHEMA: Block[] = [
     key: "vib",
     label: "Вибрато",
     optional: true,
-    fields: [num("hz", "Частота", 0.5, 60, 0.1, 10, { ...HZ, required: true }), num("depth", "Глубина", 0, 0.5, 0.01, 0.1, { required: true })],
+    fields: [num("hz", "Частота", 0.1, 60, 0.1, 10, { ...HZ, required: true }), num("depth", "Глубина", 0, 0.5, 0.01, 0.1, { required: true })],
   },
   {
     key: "jump",
@@ -145,7 +145,7 @@ export const CLASSIC_SCHEMA: Block[] = [
     optional: true,
     fields: [
       num("ms", "Через", 0, 2000, 1, 100, { ...MS, required: true }),
-      num("ratio", "Во сколько раз", 0.25, 4, 0.01, 1.5, { log: true, required: true }),
+      num("ratio", "Во сколько раз", 0.1, 10, 0.001, 1.5, { log: true, required: true }),
     ],
   },
   {
@@ -162,12 +162,12 @@ export const CLASSIC_SCHEMA: Block[] = [
     key: "hp",
     label: "ФВЧ",
     optional: true,
-    fields: [num("hz", "Срез", 1, 10000, 1, 100, { ...HZ, required: true }), num("slide", "Сдвиг", -30, 30, 0.01, 0, { unit: "окт/с" })],
+    fields: [num("hz", "Срез", 0.1, 10000, 0.1, 100, { ...HZ, required: true }), num("slide", "Сдвиг", -30, 30, 0.01, 0, { unit: "окт/с" })],
   },
   {
     key: "phaser",
     label: "Фазер",
     optional: true,
-    fields: [num("ms", "Задержка", -10, 10, 0.01, 1, { ...MS, required: true }), num("slide", "Сдвиг", -5, 5, 0.01, 0, { unit: "мс/с" })],
+    fields: [num("ms", "Задержка", -10, 10, 0.01, 1, { ...MS, required: true }), num("slide", "Сдвиг", -15, 15, 0.01, 0, { unit: "мс/с" })],
   },
 ];

@@ -36,12 +36,18 @@ export class LoopScheduler {
     if (resized) this.reset();
   }
 
-  /** Перезапуски после последнего выданного и не позже until (секунды часов AudioContext). */
-  plan(until: number): Start[] {
+  /**
+   * Перезапуски после последнего выданного и не позже until (секунды часов
+   * AudioContext). Опоздавшие раньше notBefore (вкладка спала) пропускаются —
+   * иначе сыграли бы все разом.
+   */
+  plan(until: number, notBefore = -Infinity): Start[] {
     const out: Start[] = [];
     const n = this.lengths.length;
-    if (!n) return out;
-    for (let t = this.last === null ? this.first : this.last + this.period; t <= until + 1e-9; t += this.period) {
+    if (!n || !(this.period > 0)) return out;
+    let t = this.last === null ? this.first : this.last + this.period;
+    if (t < notBefore) t += Math.ceil((notBefore - t) / this.period - 1e-9) * this.period;
+    for (; t <= until + 1e-9; t += this.period) {
       this.last = t;
       const v = Math.floor(this.rand() * n);
       const i = this.tick[v];

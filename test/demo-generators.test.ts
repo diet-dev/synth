@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { renderVariants, rng, type Classic, type Preset, type Voice } from "../src/index.ts";
 import { EXAMPLES } from "../demo/examples.ts";
-import { CATEGORIES, DEFAULT_PERIOD, LIMITS, mutate } from "../demo/generators.ts";
+import { CATEGORIES, DEFAULT_PERIOD, LIMITS, mutate, sfxVib } from "../demo/generators.ts";
+import { CLASSIC_SCHEMA, PRESET_SCHEMA, TONAL_SCHEMA, type Block } from "../demo/schema.ts";
 import type { Group } from "../demo/types.ts";
 import { readmeRecipes } from "./reference/recipes.ts";
 
@@ -80,5 +81,30 @@ describe("примеры", () => {
     const names = EXAMPLES.filter((e) => e.group === "ui" && e.sound.name !== "CLICK").map((e) => e.sound.name);
     assert.deepEqual(names, ["HOVER", "SWITCH", "OPEN", "CLOSE", "CONFIRM", "ERROR"]);
     for (const e of EXAMPLES.filter((x) => x.group === "ui")) withinLimits(e.sound.preset, "ui", e.id);
+  });
+});
+
+describe("генераторы и схема", () => {
+  it("вибрато sfxr: глубина линейна по силе, как vib_amp = strength · 0,5", () => {
+    assert.equal(sfxVib(0.3, 0.5).depth, 0.15);
+  });
+
+  it("все числа сгенерированных пресетов — в пределах ползунков редактора", () => {
+    const check = (o: Record<string, unknown>, schema: Block[], label: string): void => {
+      for (const b of schema) {
+        const t = (b.key ? o[b.key] : o) as Record<string, unknown> | undefined;
+        if (!t) continue;
+        for (const f of b.fields) {
+          const x = t[f.key];
+          if (f.kind === "num" && typeof x === "number") assert.ok(x >= f.min && x <= f.max, `${label}: ${b.key}.${f.key} = ${x} вне ${f.min}…${f.max}`);
+        }
+      }
+    };
+    for (const c of CATEGORIES)
+      for (let seed = 1; seed <= 500; seed++) {
+        const p = c.make(rng(seed));
+        check(p as Record<string, unknown>, PRESET_SCHEMA, `${c.id}#${seed}`);
+        for (const v of p.voices) check(v as Record<string, unknown>, "kind" in v ? CLASSIC_SCHEMA : TONAL_SCHEMA, `${c.id}#${seed}`);
+      }
   });
 });

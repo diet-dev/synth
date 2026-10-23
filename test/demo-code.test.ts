@@ -89,3 +89,31 @@ describe("состояние в адресе", () => {
     for (const h of bad) assert.equal(decodeState(h), null, h);
   });
 });
+
+describe("состояние в адресе: опасные значения", () => {
+  const b64 = (s: unknown): string => Buffer.from(JSON.stringify(s)).toString("base64url");
+  const st = (preset: unknown, extra: object = {}) => b64({ sound: { name: "X", loop: false, preset }, seed: 1, period: 216, ...extra });
+  const ok = { ms: 100, voices: [{ wave: "sine" }] };
+
+  it("период вне ползунка зажимается в 50…1000, сид — целый ≥ 1", () => {
+    assert.equal(decodeState(st(ok, { period: 0 }))!.period, 50);
+    assert.equal(decodeState(st(ok, { period: -5 }))!.period, 50);
+    assert.equal(decodeState(st(ok, { period: 1e9 }))!.period, 1000);
+    assert.equal(decodeState(st(ok, { seed: -3.7 }))!.seed, 1);
+  });
+
+  it("числа пресета зажимаются в пределы схемы", () => {
+    assert.equal(decodeState(st({ ms: 1e7, voices: [{ wave: "sine", hz: 1e9 }] }))!.sound.preset.ms, 5000);
+  });
+
+  it("классический голос без огибающей или частоты, нечисловое поле — null", () => {
+    assert.equal(decodeState(st({ ms: 100, voices: [{ kind: "classic", wave: "square", hz: 440 }] })), null);
+    assert.equal(decodeState(st({ ms: 100, voices: [{ kind: "classic", wave: "square", env: { a: 0, h: 10, d: 10 } }] })), null);
+    assert.equal(decodeState(st({ ms: 100, voices: [{ wave: "sine", hz: "440" }] })), null);
+    assert.equal(decodeState(st({ ms: 100, voices: [{ wave: "sine", pulses: { rate: 10 } }] })), null);
+  });
+
+  it("имя не идентификатор — null", () => {
+    assert.equal(decodeState(b64({ sound: { name: "my sound", loop: false, preset: ok }, seed: 1, period: 216 })), null);
+  });
+});
