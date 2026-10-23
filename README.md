@@ -531,7 +531,9 @@ npm run build:demo # сборка демки в dist-demo
 Source: GitHub Actions.
 
 Выпуск: поднимите `version` в `package.json`, допишите `CHANGELOG.md` и
-запушьте тег `v<версия>` — workflow `publish.yml` опубликует пакет в npm.
+запушьте тег `v<версия>`. Workflow `publish.yml` прогонит тесты и подготовит
+версию в npm (staged publish); опубликована она будет после подтверждения
+на npmjs.com с 2FA.
 
 Лицензия — MIT, см. [LICENSE](LICENSE). Классический голос повторяет алгоритм
 sfxr (MIT, Tomas Pettersson) — авторство и лицензия в [NOTICE.md](NOTICE.md).

@@ -1,8 +1,10 @@
 name: Publish
 
-# Публикация по тегу v<версия> через Trusted Publishing: без токена, с provenance.
+# Выпуск по тегу v<версия> через Trusted Publishing: без токена, с provenance.
+# CI только готовит версию (staged publish), в npm она попадает после
+# подтверждения владельцем на npmjs.com с 2FA.
 # Один раз: npmjs.com → пакет → Settings → Trusted Publisher → GitHub Actions,
-# репозиторий diet-dev/synth, workflow publish.yml.
+# репозиторий diet-dev/synth, workflow publish.yml; прямую публикацию не разрешать.
 on:
   push:
     tags: ["v*"]
@@ -26,4 +28,4 @@ jobs:
         run: test "${GITHUB_REF_NAME}" = "v$(node -p 'require("./package.json").version')"
       - run: npm ci
       # prepublishOnly — typecheck и тесты, prepare — сборка
-      - run: npm publish
+      - run: npm stage publish
